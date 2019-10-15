@@ -1,20 +1,139 @@
-class ScraperModule::Scraper
-  attr_accessor :title, :descr, :index 
 
-  def self.scraping_page
-   url = HTTParty.get("https://thegreatestbooks.org/") 
-   doc = Nokogiri::HTML(url) 
-   
-   get_page = doc.search("div.col-xs-12")
-    
+require "nokogiri"
+require "pry"
+require 'httparty'
+require 'open-uri'
+require 'mechanize'
+require 'json'
+
+
+# I'm working through how to get pagination done. I have the code for getting one page
+# scrapped beautifully and parsed well, BUT multiple pages is a struggle.
+
+    agent = Mechanize.new
+    page = agent.get("https://www.indeed.com/cmp/CVS-Health/reviews").search("div.cmp-review-container").links_with(:href => %r{/reviews?fcountry=ALL/}) 
+
+
+    # focus_links = agent.page.links_with(:href => %r{/reviews?fcountry=ALL/})
+
+    # focus_links = agent.page.links.find{|link| link.text == '2'}
+
+    # review_links = page.links_with(href: %r{^/reviews?fcountry=ALL&start=\w+})
+
+
+    # url = HTTParty.get("https://www.indeed.com/cmp/CVS-Health/reviews") 
+    # doc = Nokogiri::HTML(url) 
   
-  get_page.each do |book|
-      if book.search("h4").text.gsub(/[^0-9]/, '') != ""
-        new_book = ScraperModule::Book.new 
-        new_book.index = book.search("h4").text.gsub(/[^0-9]/, '')
-        new_book.title = book.search("h4 a").text.gsub(/\s+/, ' ')
-        new_book.descr = book.search("div p").children.text.strip
-      end 
-    end   
-  end 
-end 
+
+    reviews = page.map do |link|
+        review = link.click 
+          reviewText= review.search("span.cmp-review-text").text
+          reviewTitle = review.search("div.cmp-review-title").text
+          rating = review.search("div.cmp-ratingNumber").text
+          date = review.search("span.cmp-review-date-created").text
+          reviewerTitle = review.search("span.cmp-reviewer-job-title").text
+          reviews.push(
+            reviewTitle: reviewTitle, 
+            reviewText: reviewText, 
+            rating: rating, 
+            date: date, 
+            reviewerTitle: reviewerTitle
+          )
+    end 
+
+
+    puts JSON.pretty_generate(reviews)
+
+
+    # doc.search("span.cmp-review-text").text
+    # doc.search("div.cmp-review-title").text
+    # doc.search("div.cmp-ratingNumber").text
+    # doc.search("span.cmp-review-date-created").text
+    # doc.search("span.cmp-reviewer-job-title").text
+
+    # binding.pry
+
+
+
+
+
+
+
+
+
+
+# class CVSReviews 
+#   attr_accessor :review, :title, :date, :reviewer_title, :rating
+#     @@all = []
+
+#   def initialize(review=nil, title=nil, date=nil, reviewer_title=nil, rating=nil)
+#     @review = review
+#     @title = title
+#     @date = date
+#     @rating = rating
+#     @reviewer_title = reviewer_title
+#     @@all << self
+#   end
+
+#   def self.all 
+#     @@all
+#   end 
+  
+# end 
+
+
+# class Scraper
+#   attr_accessor :review, :title, :date, :reviewer_title, :rating
+
+#   def self.scraping_page
+#    url = HTTParty.get("https://www.indeed.com/cmp/CVS-Health/reviews") 
+#    doc = Nokogiri::HTML(url) 
+   
+#    get_page = doc.search("div.cmp-review-container")
+#    binding.pry
+
+  
+#    # change me
+#   get_page.each do |reviews|
+#       if reviews.search("div.cmp-review").text != ""
+#         new_review = CVSReviews.new 
+#         new_review.review = reviews.search("span.cmp-review-text").text
+#         new_review.title = reviews.search("div.cmp-review-title").text
+#         new_review.rating = reviews.search("div.cmp-ratingNumber").text
+#         new_review.reviewer_title = reviews.search("span.cmp-reviewer-job-title").text
+#         new_review.date = reviews.search("span.cmp-review-date-created").text
+#       end 
+#     end
+
+#     console.log(@@all)
+
+#   end 
+
+# end 
+
+
+  # Nokogiri::HTML(HTTParty.get("https://www.indeed.com/cmp/CVS-Health/reviews")).search("div.cmp-review-container").map do |reviews|
+  #       new_review = CVSReviews.new 
+  #       new_review.review = reviews.search("span.cmp-review-text").text
+  #       new_review.title = reviews.search("div.cmp-review-title").text
+  #       new_review.rating = reviews.search("div.cmp-ratingNumber").text
+  #       new_review.date = reviews.search("span.cmp-review-date-created").text
+  #       new_review.reviewer_title = reviews.search("span.cmp-reviewer-job-title").text
+  #   end   
+
+
+# everything -> div.cmp-content
+# box with the review -> cmp-review
+# rating -> div.cmp-ratingNumber
+# title -> div.cmp-review-title
+# reviewer_title -> span.cmp-reviewer-job-title => nested in a span
+# date -> span.cmp-review-date-created 
+# review -> span.cmp-review-text
+
+# Gives me all the doc text: doc.search("div#cmp-content").text
+# Gives me all the reviews: doc.search("div.cmp-review-container").text
+# Gives me all the ratings: doc.search("div.cmp-ratingNumber").text
+# Gives me all the dates: doc.search("span.cmp-review-date-created").text
+# Gives me all the review titles: doc.search("div.cmp-review-title").text
+# Gives me all the reviewer titles: doc.search("span.cmp-reviewer-job-title").text
+# Gives me the content for reviews: doc.search("span.cmp-review-text").text
