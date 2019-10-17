@@ -5,14 +5,15 @@ require 'httparty'
 require 'open-uri'
 require 'mechanize'
 require 'json'
+require 'csv'
+require 'pp'
 
 
-# I'm working through how to get pagination done. I have the code for getting one page
-# scrapped beautifully and parsed well, BUT multiple pages is a struggle.
+# I get all the reviews across multiple pages! Not pretty, but I get it
 
-    agent = Mechanize.new
-    page = agent.get("https://www.indeed.com/cmp/CVS-Health/reviews").search("div.cmp-review-container").links_with(:href => %r{/reviews?fcountry=ALL/}) 
 
+# .search("div.cmp-review-container")
+    # mechanized_page = page.search("div.cmp-review-container")
 
     # focus_links = agent.page.links_with(:href => %r{/reviews?fcountry=ALL/})
 
@@ -23,26 +24,77 @@ require 'json'
 
     # url = HTTParty.get("https://www.indeed.com/cmp/CVS-Health/reviews") 
     # doc = Nokogiri::HTML(url) 
-  
 
-    reviews = page.map do |link|
-        review = link.click 
-          reviewText= review.search("span.cmp-review-text").text
-          reviewTitle = review.search("div.cmp-review-title").text
-          rating = review.search("div.cmp-ratingNumber").text
-          date = review.search("span.cmp-review-date-created").text
-          reviewerTitle = review.search("span.cmp-reviewer-job-title").text
-          reviews.push(
+    agent = Mechanize.new
+
+    url = "https://www.indeed.com/cmp/CVS-Health/reviews?fcountry=ALL&start=00"
+    page = agent.get(url)
+
+
+    CSV.open("cvs_reviews.csv", "w+") do |csv| 
+      csv << ["reviewText", "reviewTitle", "rating", "date", "reviewerTitle"]
+    end 
+
+    
+    page_num = 00
+    reviews = []
+
+# two problems-- not saving to CSV and also not going past 1st page
+
+
+  while(page_num < 1000)
+    page.search("div.cmp-review-container").each do |review|
+
+        reviewText= review.search("span.cmp-review-text").text
+        reviewTitle = review.search("div.cmp-review-title").text
+        rating = review.search("div.cmp-ratingNumber").text
+        date = review.search("span.cmp-review-date-created").text
+        reviewerTitle = review.search("span.cmp-reviewer-job-title").text
+
+
+        reviews.push(
             reviewTitle: reviewTitle, 
             reviewText: reviewText, 
             rating: rating, 
             date: date, 
             reviewerTitle: reviewerTitle
-          )
+        )
     end 
 
+    # CSV.open("cvs_reviews.csv", "a+") do |csv| 
+    #   reviews.each do |review|
+    #     csv << review
+    #   end 
+    # end 
 
-    puts JSON.pretty_generate(reviews)
+    puts reviews
+
+    page = agent.get("https://www.indeed.com/cmp/CVS-Health/reviews?fcountry=ALL&start=#{page_num+=20}")
+
+    page_num += 20
+
+
+  end 
+
+
+    # reviews = review_links.map do |link|
+    #     review = link.click 
+    #       reviewText= review.search("span.cmp-review-text").text
+    #       reviewTitle = review.search("div.cmp-review-title").text
+    #       rating = review.search("div.cmp-ratingNumber").text
+    #       date = review.search("span.cmp-review-date-created").text
+    #       reviewerTitle = review.search("span.cmp-reviewer-job-title").text
+    #       reviews.push(
+    #         reviewTitle: reviewTitle, 
+    #         reviewText: reviewText, 
+    #         rating: rating, 
+    #         date: date, 
+    #         reviewerTitle: reviewerTitle
+    #       )
+    # end 
+
+
+    # puts JSON.pretty_generate(reviews)
 
 
     # doc.search("span.cmp-review-text").text
@@ -137,3 +189,8 @@ require 'json'
 # Gives me all the review titles: doc.search("div.cmp-review-title").text
 # Gives me all the reviewer titles: doc.search("span.cmp-reviewer-job-title").text
 # Gives me the content for reviews: doc.search("span.cmp-review-text").text
+
+
+
+
+
