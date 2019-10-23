@@ -10,7 +10,7 @@ require 'json'
 # To get this to work, run "ruby quick-scraper.rb" from the command line, path being desktop
 # Next step is to get this to work across all the pages
 
-    url = HTTParty.get("https://www.indeed.com/cmp/CVS-Health/reviews") 
+    url = HTTParty.get("INSERT_URL") 
     doc = Nokogiri::HTML(url) 
   
 
