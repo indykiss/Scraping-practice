@@ -8,6 +8,11 @@ require 'json'
 require 'csv'
 require 'pp'
 
+# This rb file is a work in progress for an attempt to scrape multiple pages
+# And take this data and push it into a CSV. 
+# This does not work. Do not use this UNLESS I'm ready to put in like 5 hours of work
+# To get this up and running.
+
 
 # I'm working through how to get pagination done. I have the code for getting one page
 # scrapped beautifully and parsed well, BUT multiple pages is a struggle.
