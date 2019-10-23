@@ -29,16 +29,16 @@ require 'pp'
     # review_links = page.links_with(href: %r{^/reviews?fcountry=ALL&start=\w+})
 
 
-    # url = HTTParty.get("https://www.indeed.com/cmp/CVS-Health/reviews") 
+    # url = HTTParty.get("INSERT_URL") 
     # doc = Nokogiri::HTML(url) 
 
     agent = Mechanize.new
 
-    url = "https://www.indeed.com/cmp/CVS-Health/reviews"
+    url = "INSERT_URL"
     page = agent.get(url)
 
 
-    CSV.open("cvs_reviews.csv", "w+") do |csv| 
+    CSV.open("client_reviews.csv", "w+") do |csv| 
       csv << ["reviewText", "reviewTitle", "rating", "date", "reviewerTitle"]
     end 
 
@@ -69,7 +69,7 @@ require 'pp'
     end 
 
 
-  CSV.open("cvs_reviews.csv", "a+") do |csv| 
+  CSV.open("client_reviews.csv", "a+") do |csv| 
     reviews.each do |review|
       csv << review
     end 
@@ -77,7 +77,7 @@ require 'pp'
 
   page_num += 20
 
-  page = agent.get("https://www.indeed.com/cmp/CVS-Health/reviews?fcountry=ALL&start=#{page_num}")
+  page = agent.get("INSERT_URL#{page_num}")
 
   
 
@@ -121,7 +121,7 @@ end
 
 
 
-# class CVSReviews 
+# class ClientReviews 
 #   attr_accessor :review, :title, :date, :reviewer_title, :rating
 #     @@all = []
 
@@ -145,7 +145,7 @@ end
 #   attr_accessor :review, :title, :date, :reviewer_title, :rating
 
 #   def self.scraping_page
-#    url = HTTParty.get("https://www.indeed.com/cmp/CVS-Health/reviews") 
+#    url = HTTParty.get("INSERT_URL") 
 #    doc = Nokogiri::HTML(url) 
    
 #    get_page = doc.search("div.cmp-review-container")
@@ -171,8 +171,8 @@ end
 # end 
 
 
-  # Nokogiri::HTML(HTTParty.get("https://www.indeed.com/cmp/CVS-Health/reviews")).search("div.cmp-review-container").map do |reviews|
-  #       new_review = CVSReviews.new 
+  # Nokogiri::HTML(HTTParty.get("INSERT_URL")).search("div.cmp-review-container").map do |reviews|
+  #       new_review = ClientReviews.new 
   #       new_review.review = reviews.search("span.cmp-review-text").text
   #       new_review.title = reviews.search("div.cmp-review-title").text
   #       new_review.rating = reviews.search("div.cmp-ratingNumber").text
