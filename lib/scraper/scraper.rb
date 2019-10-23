@@ -8,22 +8,24 @@ require 'json'
 require 'csv'
 require 'pp'
 
-# Kinda sorta works? The other way to do it is a little better I think? Not sure wtf happened here
-# Couple next steps: trying to get this to save to CSV and also realizing that CVS inded DOESNT USE RESTFUL URLS :{ 
-# SO thats fun
+# I am a quick and dirty scraper that works to pull multiple pages and console logs the data. 
+# When working with data, the data source (indeed) did not use restful routing so page 2 would just reload the 
+# same reviews as page 1. So workaround is to just console log massive amounts of data, copy and paste into 
+# an excel, organize, and remove duplicates. 
+# The end results isn't 100% of the data, but is a very good sample size. 
 
-    
+# Couple next steps: trying to get this to save to CSV
+
+    # page_num numbers depends on the URL page. This client used index of reviews as part of their URL. 
+    # which is weird
     page_num = 2000
     reviews = []
-
-# two problems-- not saving to CSV and also not going past 1st page
-
 
   while(page_num < 500)
 
     agent = Mechanize.new
 
-    url = "https://www.indeed.com/cmp/CVS-Health/reviews?fcountry=ALL&ftopic=jobsecadv&start=20"
+    url = "INSERT_URL_HERE"
     page = agent.get(url)
 
     page.search("div.cmp-review-container").each do |review|
@@ -34,7 +36,6 @@ require 'pp'
         date = review.search("span.cmp-review-date-created").text
         reviewerTitle = review.search("span.cmp-reviewer-job-title").text
 
-
         reviews.push(
             reviewTitle: reviewTitle, 
             reviewText: reviewText, 
@@ -44,10 +45,9 @@ require 'pp'
         )
     end 
 
-    page = agent.get("https://www.indeed.com/cmp/CVS-Health/reviews?fcountry=ALL&ftopic=jobsecadv&start=#{page_num+=20}")
+    page = agent.get("INSERT_URL_HERE#{page_num+=20}")
     
     page_num += 20 
-    # puts "https://www.indeed.com/cmp/CVS-Health/reviews?fcountry=ALL&start=#{page_num+=20}"
 
     puts reviews
   
@@ -59,42 +59,29 @@ require 'pp'
 
 
 
+# ONE ATTEMPT TO DO THIS:
 
 
+#  .search("div.cmp-review-container")
+#     mechanized_page = page.search("div.cmp-review-container")
 
-# require "nokogiri"
-# require "pry"
-# require 'httparty'
-# require 'open-uri'
-# require 'mechanize'
-# require 'json'
-# require 'csv'
-# require 'pp'
+#      focus_links = agent.page.links_with(:href => %r{/reviews?fcountry=ALL/})
 
+#      focus_links = agent.page.links.find{|link| link.text == '2'}
 
-# # I get all the reviews across multiple pages! Not pretty, but I get it
+#      review_links = page.links_with(href: %r{^/reviews?fcountry=ALL&start=\w+})
 
 
-# # .search("div.cmp-review-container")
-#     # mechanized_page = page.search("div.cmp-review-container")
-
-#     # focus_links = agent.page.links_with(:href => %r{/reviews?fcountry=ALL/})
-
-#     # focus_links = agent.page.links.find{|link| link.text == '2'}
-
-#     # review_links = page.links_with(href: %r{^/reviews?fcountry=ALL&start=\w+})
-
-
-#     # url = HTTParty.get("https://www.indeed.com/cmp/CVS-Health/reviews") 
-#     # doc = Nokogiri::HTML(url) 
+#      url = HTTParty.get("INSERT_URL") 
+#      doc = Nokogiri::HTML(url) 
 
 #     agent = Mechanize.new
 
-#     url = "https://www.indeed.com/cmp/CVS-Health/reviews?fcountry=ALL&start=00"
+#     url = "INSERT_URL"
 #     page = agent.get(url)
 
 
-#     CSV.open("cvs_reviews.csv", "w+") do |csv| 
+#     CSV.open("client_reviews.csv", "w+") do |csv| 
 #       csv << ["reviewText", "reviewTitle", "rating", "date", "reviewerTitle"]
 #     end 
 
@@ -102,7 +89,7 @@ require 'pp'
 #     page_num = 00
 #     reviews = []
 
-# # two problems-- not saving to CSV and also not going past 1st page
+# two problems-- not saving to CSV and also not going past 1st page
 
 
 #   while(page_num < 1000)
@@ -124,7 +111,7 @@ require 'pp'
 #         )
 #     end 
 
-#     # CSV.open("cvs_reviews.csv", "a+") do |csv| 
+#     # CSV.open("client_reviews.csv", "a+") do |csv| 
 #     #   reviews.each do |review|
 #     #     csv << review
 #     #   end 
@@ -132,7 +119,7 @@ require 'pp'
 
 #     puts reviews
 
-#     page = agent.get("https://www.indeed.com/cmp/CVS-Health/reviews?fcountry=ALL&start=#{page_num+=20}")
+#     page = agent.get("INSERT_URL_HERE_#{page_num+=20}")
 
 #     page_num += 20
 
@@ -140,118 +127,56 @@ require 'pp'
 #   end 
 
 
-#     # reviews = review_links.map do |link|
-#     #     review = link.click 
-#     #       reviewText= review.search("span.cmp-review-text").text
-#     #       reviewTitle = review.search("div.cmp-review-title").text
-#     #       rating = review.search("div.cmp-ratingNumber").text
-#     #       date = review.search("span.cmp-review-date-created").text
-#     #       reviewerTitle = review.search("span.cmp-reviewer-job-title").text
-#     #       reviews.push(
-#     #         reviewTitle: reviewTitle, 
-#     #         reviewText: reviewText, 
-#     #         rating: rating, 
-#     #         date: date, 
-#     #         reviewerTitle: reviewerTitle
-#     #       )
-#     # end 
+# I AM A WAY TO GRAB REVIEWS AND ADD THEM TO A HASH
+
+#      reviews = review_links.map do |link|
+#          review = link.click 
+#            reviewText= review.search("span.cmp-review-text").text
+#            reviewTitle = review.search("div.cmp-review-title").text
+#            rating = review.search("div.cmp-ratingNumber").text
+#            date = review.search("span.cmp-review-date-created").text
+#            reviewerTitle = review.search("span.cmp-reviewer-job-title").text
+#            reviews.push(
+#              reviewTitle: reviewTitle, 
+#              reviewText: reviewText, 
+#              rating: rating, 
+#              date: date, 
+#              reviewerTitle: reviewerTitle
+#            )
+#      end 
 
 
-#     # puts JSON.pretty_generate(reviews)
+#      puts JSON.pretty_generate(reviews)
 
 
-#     # doc.search("span.cmp-review-text").text
-#     # doc.search("div.cmp-review-title").text
-#     # doc.search("div.cmp-ratingNumber").text
-#     # doc.search("span.cmp-review-date-created").text
-#     # doc.search("span.cmp-reviewer-job-title").text
+#      doc.search("span.cmp-review-text").text
+#      doc.search("div.cmp-review-title").text
+#      doc.search("div.cmp-ratingNumber").text
+#      doc.search("span.cmp-review-date-created").text
+#      doc.search("span.cmp-reviewer-job-title").text
 
-#     # binding.pry
-
-
-
-
-
+#      binding.pry
 
 
 
+# I AM THE TAGS NEEDED TO GET CONTENT
 
 
-# # class CVSReviews 
-# #   attr_accessor :review, :title, :date, :reviewer_title, :rating
-# #     @@all = []
+# everything -> div.cmp-content
+# box with the review -> cmp-review
+# rating -> div.cmp-ratingNumber
+# title -> div.cmp-review-title
+# reviewer_title -> span.cmp-reviewer-job-title => nested in a span
+# date -> span.cmp-review-date-created 
+# review -> span.cmp-review-text
 
-# #   def initialize(review=nil, title=nil, date=nil, reviewer_title=nil, rating=nil)
-# #     @review = review
-# #     @title = title
-# #     @date = date
-# #     @rating = rating
-# #     @reviewer_title = reviewer_title
-# #     @@all << self
-# #   end
-
-# #   def self.all 
-# #     @@all
-# #   end 
-  
-# # end 
-
-
-# # class Scraper
-# #   attr_accessor :review, :title, :date, :reviewer_title, :rating
-
-# #   def self.scraping_page
-# #    url = HTTParty.get("https://www.indeed.com/cmp/CVS-Health/reviews") 
-# #    doc = Nokogiri::HTML(url) 
-   
-# #    get_page = doc.search("div.cmp-review-container")
-# #    binding.pry
-
-  
-# #    # change me
-# #   get_page.each do |reviews|
-# #       if reviews.search("div.cmp-review").text != ""
-# #         new_review = CVSReviews.new 
-# #         new_review.review = reviews.search("span.cmp-review-text").text
-# #         new_review.title = reviews.search("div.cmp-review-title").text
-# #         new_review.rating = reviews.search("div.cmp-ratingNumber").text
-# #         new_review.reviewer_title = reviews.search("span.cmp-reviewer-job-title").text
-# #         new_review.date = reviews.search("span.cmp-review-date-created").text
-# #       end 
-# #     end
-
-# #     console.log(@@all)
-
-# #   end 
-
-# # end 
-
-
-#   # Nokogiri::HTML(HTTParty.get("https://www.indeed.com/cmp/CVS-Health/reviews")).search("div.cmp-review-container").map do |reviews|
-#   #       new_review = CVSReviews.new 
-#   #       new_review.review = reviews.search("span.cmp-review-text").text
-#   #       new_review.title = reviews.search("div.cmp-review-title").text
-#   #       new_review.rating = reviews.search("div.cmp-ratingNumber").text
-#   #       new_review.date = reviews.search("span.cmp-review-date-created").text
-#   #       new_review.reviewer_title = reviews.search("span.cmp-reviewer-job-title").text
-#   #   end   
-
-
-# # everything -> div.cmp-content
-# # box with the review -> cmp-review
-# # rating -> div.cmp-ratingNumber
-# # title -> div.cmp-review-title
-# # reviewer_title -> span.cmp-reviewer-job-title => nested in a span
-# # date -> span.cmp-review-date-created 
-# # review -> span.cmp-review-text
-
-# # Gives me all the doc text: doc.search("div#cmp-content").text
-# # Gives me all the reviews: doc.search("div.cmp-review-container").text
-# # Gives me all the ratings: doc.search("div.cmp-ratingNumber").text
-# # Gives me all the dates: doc.search("span.cmp-review-date-created").text
-# # Gives me all the review titles: doc.search("div.cmp-review-title").text
-# # Gives me all the reviewer titles: doc.search("span.cmp-reviewer-job-title").text
-# # Gives me the content for reviews: doc.search("span.cmp-review-text").text
+# Gives me all the doc text: doc.search("div#cmp-content").text
+# Gives me all the reviews: doc.search("div.cmp-review-container").text
+# Gives me all the ratings: doc.search("div.cmp-ratingNumber").text
+# Gives me all the dates: doc.search("span.cmp-review-date-created").text
+# Gives me all the review titles: doc.search("div.cmp-review-title").text
+# Gives me all the reviewer titles: doc.search("span.cmp-reviewer-job-title").text
+# Gives me the content for reviews: doc.search("span.cmp-review-text").text
 
 
 
