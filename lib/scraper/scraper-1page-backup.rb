@@ -37,7 +37,7 @@ require 'json'
 
 
 
-
+# Here are the tags I pulled off the DOM to capture the right content. 
 
 # Gives me all the doc text: doc.search("div#cmp-content").text
 # Gives me all the reviews: doc.search("div.cmp-review-container").text
