@@ -91,7 +91,6 @@ require 'pp'
 
 # two problems-- not saving to CSV and also not going past 1st page
 
-
 #   while(page_num < 1000)
 #     page.search("div.cmp-review-container").each do |review|
 
@@ -159,8 +158,8 @@ require 'pp'
 
 
 
-# I AM THE TAGS NEEDED TO GET CONTENT
 
+# I AM THE TAGS NEEDED TO GET CONTENT
 
 # everything -> div.cmp-content
 # box with the review -> cmp-review
