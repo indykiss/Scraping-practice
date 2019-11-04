@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 gem "httparty"
-gem "nokogiri"
+gem "nokogiri", ">= 1.10.4"
 
 
 git_source(:github) {|repo_name| "https://github.com/indykiss/ranking_scraper" }
