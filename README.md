@@ -3,22 +3,6 @@
 
 Built a quick scraper to pull employee reviews on indeed for a client. 
 
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'ranking_scraper'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install ranking_scraper
-
 ## Usage
 
 TODO: Write usage instructions here
