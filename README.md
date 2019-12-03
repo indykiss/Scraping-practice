@@ -1,7 +1,7 @@
 
 # Employee sentiment scraper 
 
-Built a quick scraper to pull employee reviews on indeed for a client. 
+Built a quick scraper to pull employee reviews on indeed for a client. Used this code to pull several thousand reviews. Next time, try import.io first as a quicker way to do this. 
 
 ## Usage
 
